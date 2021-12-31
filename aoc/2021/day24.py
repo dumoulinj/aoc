@@ -48,11 +48,10 @@ def check_monads():
     j = -1 
     total = 9e14
 
-    a = 1
-    b = 10
-    s = 1
-    r = False
-
+    a = 9
+    b = 0
+    s = -1
+    r = True 
     ans = -1
     for _1 in range(a, b, s):
         for _2 in range(a, b, s):
