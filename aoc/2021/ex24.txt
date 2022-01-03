@@ -1,252 +1,277 @@
-inp w
-mul x 0
-add x z
-mod x 26
-div z 1
-add x 10
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 0
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 1
-add x 12
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
+w = 0 x = 0 y = 0 z = 0
+
+#inp w
+w = D1
+#mul x 0
+#add x z
+#mod x 26
+#div z 1
+#add x 10
+#eql x w
+#eql x 0
+x = 1
+#mul y 0
+#add y 25 -> y = 25
+#mul y x -> y = 25
+#add y 1 -> y = 26
+#mul z y
+#mul y 0
+#add y w
+y = D1
+#add y 0
+#mul y x
+#add z y
+z = D1
+
+-----------------------------
+w = D1, x = 1, y = D1, z = D1
+
+#inp w
+w = D2
+#mul x 0
+x = 0
+#add x z
+x = D1
+#mod x 26
+x = x % 26 = D1 
+#div z 1
+z = D1
+#add x 12
+x = D1 + 12
+#eql x w
+x = 0
+#eql x 0
+x = 1
+#mul y 0
+y = 0
+#add y 25
+y = 25
+#mul y x
+y = 25
+#add y 1
+y = 26
+#mul z y
+z = D1 * 26
+#mul y 0
+y = 0
+#add y w
+y = D2
 add y 6
+y = D2 + 6
 mul y x
+y = D2 + 6
 add z y
-inp w
+z = D2 + 6 + (D1 * 26)
+
+--------------------------
+w = D2, x = 1, y = D2 + 6, z = D2 + 6 + (D1 * 26)
+
+inp w -> w = D3
 mul x 0
+x = 0
 add x z
-mod x 26
+x = D2 + 6 + (D1*26)
+mod x 26 -> peut être remplacé par x = y
+x = D2 + 6
 div z 1
+z = D2 + 6 + (D1 * 26)
 add x 13
+x = D2 + 19
 eql x w
+x = 0
 eql x 0
+x = 1
 mul y 0
+y = 0
 add y 25
+y = 25
 mul y x
+y = 25
 add y 1
+y = 26
 mul z y
+z = (D2 + 6 + (D1*26)) * 26
 mul y 0
+y = 0
 add y w
+y = D3
 add y 4
+y = D3 + 4
 mul y x
+y = D3 + 4
 add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 1
-add x 13
+z = ((D2 + 6 + (D1*26)) * 26) + D3 + 4
+
+----------------------------------------
+w = D3, x = 1, y = D3 + 4, z = ((D2 + 6 + (D1*26)) * 26) + D3 + 4
+
+inp w -> w = D4
+x = 1
+y = 26
+mul z y
+z = (((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26
+
+y = D4 + 2
+add z y
+z = (((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2
+
+---------------------------------------
+w = D4, x = 1, y = D4 + 2, z = (((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2
+
+w = D5
+x = 1
+y = D5 + 9
+z = (((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9
+
+------------------------------------------------------------------------------------------------
+w = D6
+z = ((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9) / 26
+x = D5 + 7
 eql x w
 eql x 0
+!!!!!! x = 0 if D5 + 7 == D6
 mul y 0
 add y 25
 mul y x
 add y 1
+!!!!!! y = 1
 mul z y
-mul y 0
-add y w
-add y 2
-mul y x
+z = ((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9) / 26
+y = 0
 add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 1
-add x 14
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 9
-mul y x
+z = ((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9) / 26
+
+w = D6
+x = 0
+y = 0
+z = ((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9) / 26
+----------------------------------------------------------------------------------------------------------
+
+w = D7
+x = 1
+y = 26
+y = D7 + 10
+z = (((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10
+
+----------------------------------------------------------------------------------------------------------
+
+w = D8
+!!!!!! x = 0 if D7 - 5 == D8
+y = 0
+z = (((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26
+
+--------------------------------------------------------------------------------------------------
+w = D9
+!!! x = 0 if D5 - 1  == D9
+y = 0
+z = ((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) / 26
+
+-----------------------------------------------------------------------------------------------------------------
+w = D10
+x = 1
+y = 26
+z = ((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26)
+y = D10 + 6
 add z y
-inp w
-mul x 0
-add x z
-mod x 26
+z = ((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6
+
+-----------------------------------------------------------------------------------------------------------------
+inp w -> w = D11
+z = (((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6) / 26
+!!!!! x = 0 if D5 + D10 + 5 = D11
+y = 1
+z = (((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6) / 26
+
+-----------------------------------------------------------------------------------------------------------------
+w = D12
+!!!!!! x = 0 if D4 - 2 == D12
+y = 0
+z = (((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6)
+
+------------------------------------------------------------------------------------------------------------------
+w = D13
+x = 1
+y = 26
+z = (((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6)
+y = D13 + 15
+z = (((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6) + D13 + 15
+
+------------------------------------------------------------------------------------------------------------------
+w = D14
 div z 26
-add x -2
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 1
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 1
-add x 11
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 10
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 26
-add x -15
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 6
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 26
-add x -10
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 4
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 1
-add x 10
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 6
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 26
-add x -10
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 3
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 26
-add x -4
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 9
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 26
-add x -1
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
-add y w
-add y 15
-mul y x
-add z y
-inp w
-mul x 0
-add x z
-mod x 26
-div z 26
-add x -1
-eql x w
-eql x 0
-mul y 0
-add y 25
-mul y x
-add y 1
-mul z y
-mul y 0
+z = ((((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6) + D13 + 15) / 26
+x = 1
+y = 26
+z = ((((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6) + D13 + 15)
 add y w
 add y 5
-mul y x
+y = D14 + 5
 add z y
+z = ((((((((((D2 + 6 + (D1*26)) * 26) + D3 + 4)* 26 + D4 + 2) * 26 + D5 + 9))*26 + D7 + 10) / 26) + D10 + 6) + D13 + 15) + D14 + 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+inp w -> w = D13
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -1
+eql x w
+eql x 0
+
+#mul y 0 -> y = 0
+#add y 25 -> y = 25
+#mul y x -> y = 25 * x
+#add y 1 -> y = (25 * x) + 1
+#mul z y
+z = ((25 * x) + 1) * z
+
+mul y 0 -> y = 0
+add y w -> y = D13
+add y 15 -> y = D13 + 15
+mul y x -> y = (D13 + 15) * x
+add z y -> z = z + (D13 + 15) * x
+
+inp w -> W = D14
+#mul x 0 -> x = 0
+#add x z -> x = z1
+#mod x 26 -> x = z1 % 26
+#div z 26 -> z = z / 26
+add x -1 -> x = x - 1 = (z1 % 26) - 1
+
+#eql x w
+#eql x 0
+
+x == D14 --> X = 0
+x != D14 --> X = 1
+
+#mul y 0 -> y = 0
+#add y 25 -> y = 25
+#mul y x -> y = 25 * x
+#add y 1 -> y = (25 * x) + 1
+#mul z y
+Z = ((25 * x) + 1) * z
+
+#mul y 0 -> y = 0 
+#add y w -> y = w
+#add y 5 -> y = w + 5
+#mul y x -> y = y * x <- x == 0 (OR y * x == 1!!!)
+
+Y = (D14 + 5) * x (y est déterminé ici!)
+Y = [6 : 14]
+
+add z y
+
+Z == -Y

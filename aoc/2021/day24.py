@@ -67,10 +67,12 @@ def check_monads():
                                                 for _12 in range(a, b, s):
                                                     for _13 in range(a, b, s):
                                                         for _14 in range(a, b, s):
-                                                            k = int(i / total * 100)
+                                                            k = int(i / total * 1000)
                                                             if k != j:
                                                                 j = k
                                                                 print(f"{j}%")
+                                                            
+                                                            continue
 
                                                             i += 1
                                                             m = str(_1) + str(_2) + str(_3) + str(_4) + str(_5) + str(_6) + str(_7) + str(_8) + str(_9) + str(_10) + str(_11) + str(_12) + str(_13) + str(_14)
