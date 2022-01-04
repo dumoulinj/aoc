@@ -6,7 +6,7 @@ from copy import copy, deepcopy
 # a: 14:05
 # b: 
 
-# puzzle = Puzzle(year=2021, day=22)
+puzzle = Puzzle(year=2021, day=22)
 
 # with open('ex22.txt') as infile:
 #    lines = infile.readlines()
@@ -58,9 +58,6 @@ def do_intersect(a, b):
     
     return True
 
-def get_nb_points_in_range(r):
-    return (r[0][1] - r[0][0]) * (r[1][1] - r[1][0]) * (r[2][1] - r[2][0])
-
 def get_intersect_range(a, b):
     ax1, ax2 = a[0]
     ay1, ay2 = a[1]
@@ -81,21 +78,15 @@ def get_intersect_range(a, b):
 
     return ((ix1, ix2), (iy1, iy2), (iz1, iz2))
 
+def get_nb_points_in_range(a):
+    ax1, ax2 = a[0]
+    ay1, ay2 = a[1]
+    az1, az2 = a[2]
+    return (ax2-ax1+1) * (ay2-ay1+1) * (az2-az1+1)
 
-def get_nb_points_off(off_list):
-    nb = 0
-    for off in off_list:
-        nb += get_nb_points_in_range(off)
-    
-    for i in range(len(off_list)-1):
-        for j in range(i+1, len(off_list)):
-            a = off_list[i]
-            b = off_list[j]
-            nb -= get_nb_points_in_range(get_intersect_range(a, b))
-    
-    return nb
+cubes_on = list()
+cubes_off = list()
 
-cubes_on = defaultdict(list)
 for i, l in enumerate(lines):
     p1, p2 = l.strip().split(' ')
     on_off = p1 == "on"
@@ -114,83 +105,35 @@ for i, l in enumerate(lines):
 
     a = ((x1, x2), (y1, y2), (z1, z2))
 
-    nb_intersect = 0
-    ir = list()
+    new_cubes_on = list()
+    new_cubes_off = list()
+
+    if on_off:
+        new_cubes_on.append(a)
+
     for b in cubes_on:
         if do_intersect(a, b):
-            nb_intersect += 1
             intersect_range = get_intersect_range(a, b)
+            new_cubes_off.append(intersect_range)
 
-            if on_off:
-                ir.append(("x", intersect_range))
-                cubes_on[b].append(("on", intersect_range))
-            else:
-                cubes_on[b].append(("off", intersect_range))
+    for b in cubes_off:
+        if do_intersect(a, b):
+            intersect_range = get_intersect_range(a, b)
+            new_cubes_on.append(intersect_range)
+    
+    for c in new_cubes_on:
+        cubes_on.append(c)
 
-    if nb_intersect == 0 and on_off:
-        cubes_on[a] = list()
-    else:
-        cubes_on[a] = ir
+    for c in new_cubes_off:
+        cubes_off.append(c)
+
 
 res = 0
-i = 0
-for c, action_list in cubes_on.items():
-    print(i, len(cubes_on))
-    if len(action_list) == 0:
-        print("A")
-        res += get_nb_points_in_range(c)
-    else:
-        print("B")
-        x_list = list()
-        for a, r in action_list:
-            if a == 'x':
-                x_list.append(r)
+for c in cubes_on:
+    res += get_nb_points_in_range(c)
 
-        x1, x2 = c[0]
-        y1, y2 = c[1]
-        z1, z2 = c[2]
-
-
-        cubes = dict()       
-        # for x in range(x1, x2 + 1):
-        #     for y in range(y1, y2 + 1):
-        #         for z in range(z1, z2 + 1):
-        #             for _x in x_list:
-        #                 _xx1, _xx2 = _x[0]
-        #                 _xy1, _xy2 = _x[1]
-        #                 _xz1, _xz2 = _x[2]
-
-        #                 if (_xx1 <= x <= _xx2) and (_xy1 <= y <= _xy2) and (_xz1 <= z <= _xz2):
-        #                     pass
-        #                 else:
-        #                     cubes[(x, y, z)] = True 
-        
-        for a, r in action_list:
-            if a == "on" or a == "off":
-                x1, x2 = r[0]
-                y1, y2 = r[1]
-                z1, z2 = r[2]
-                
-                for x in range(x1, x2 + 1):
-                    for y in range(y1, y2 + 1):
-                        for z in range(z1, z2 + 1):
-                            for _x in x_list:
-                                _xx1, _xx2 = _x[0]
-                                _xy1, _xy2 = _x[1]
-                                _xz1, _xz2 = _x[2]
-
-                                if (_xx1 <= x <= _xx2) and (_xy1 <= y <= _xy2) and (_xz1 <= z <= _xz2):
-                                    pass
-                                else:
-                                    cubes[(x, y, z)] = a == "on"
-        
-        res += sum(cubes.values())
-
-    i += 1
-
+for c in cubes_off:
+    res -= get_nb_points_in_range(c)
 
 print("part b: {}".format(res))
-#puzzle.answer_b = res
-
-#8468310916723377
-#2758514936282235
+puzzle.answer_b = res
