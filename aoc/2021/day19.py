@@ -58,6 +58,7 @@ class Transformation(object):
 class Scanner(object):
     _id:int = attr.ib()
     beacons:list = attr.ib(init=False, factory=list)
+    ref_beacons:list = attr.ib(init=False, factory=list)
     distances:defaultdict = attr.ib(init=False, default=attr.Factory(lambda: defaultdict(list)))
     position:Position = attr.ib(init=False)
     orientation:Orientation = attr.ib(init=False)
@@ -93,15 +94,6 @@ def get_equal_distances(s1, s2):
             ed.append((v, s2.distances[k]))
     
     return ed
-
-
-# _dirs = [-1, 1]
-# orientations = list()
-# for x in _dirs:
-#     for y in _dirs:
-#         for z in _dirs:
-#             for up in range(4):
-#                 orientations.append(Orientation(x, y, z, up))
 
 orientations = [
     Orientation(1, 1, 1, 0),    #  x y z
@@ -231,6 +223,7 @@ for l in lines:
         x, y, z = l.split(",")
         b = Beacon(int(x), int(y), int(z))
         scanner.beacons.append(b)
+        scanner.ref_beacons.append(deepcopy(b))
 
 scanners.append(scanner)
 
@@ -256,7 +249,7 @@ while len(unref_scanners) > 0:
                 break
             
             s1 = sref
-            print(s1._id, s2._id)
+            # print(s1._id, s2._id)
 
             ed = get_equal_distances(s1, s2)
 
@@ -279,34 +272,26 @@ while len(unref_scanners) > 0:
                             # if bt == b1:
                                 count += 1
                     
-                    print("Count ", count)
+                    # print("Count ", count)
 
                     if count >= 12:
                         print("Found ", s2._id, s1._id, t)
                         found_ref = True
+
                         s2.position = t.pos
                         s2.orientation = t.o
+                        s2.parent = s1
+                        parent = s2.parent
 
-                        for b in s2.beacons:
-                            b.update(apply_transformation(b, t)) 
-                        
-                        s2.compute_distances()
-                        
-                        # if s2._id == 3:
-                        #     print(s2.beacons)
-                        #     assert False
-                        #temp_pos = Position(t.pos.x + s1.position.x, t.pos.y + s1.position.y, t.pos.z + s1.position.z)
-                        # s2.parent = s1
-                        # s2.position = t.pos
-                        # parent = s1
-                        # while parent._id != 0:
+                        s2.ref_beacons = [apply_transformation(p, Transformation(s2.position, s2.orientation)) for p in s2.ref_beacons]
+                        if parent is not None:
+                            s2.position = apply_transformation(s2.position, Transformation(parent.position, parent.orientation))
+                            s2.ref_beacons = [apply_transformation(p, Transformation(parent.position, parent.orientation)) for p in s2.ref_beacons]
+
+                        # while parent is not None:
                         #     s2.position = apply_transformation(s2.position, Transformation(parent.position, parent.orientation))
-                        #     if s2._id == 2:
-                        #         print(s2.position)
+                        #     s2.ref_beacons = [apply_transformation(p, Transformation(parent.position, parent.orientation)) for p in s2.ref_beacons]
                         #     parent = parent.parent
-                        # #s2.position = t.pos
-                        # s2.orientation = t.o
-                        # #s2.beacons = transformed
 
                         new_ref_scanners.append(s2)
                         break
@@ -323,12 +308,12 @@ while len(unref_scanners) > 0:
         
 all_beacons = set()
 for s in scanners:
-    print(s._id, s.position, s.orientation)
+    print(s._id, s.position, s.orientation, s.parent._id if s.parent is not None else None)
     # if s._id != 1:
     #     continue
 
-    s.beacons = [apply_transformation(p, Transformation(s.position, s.orientation)) for p in s.beacons]
-    for b in s.beacons:
+    #s.beacons = [apply_transformation(p, Transformation(s.position, s.orientation)) for p in s.beacons]
+    for b in s.ref_beacons:
         all_beacons.add((b.x, b.y, b.z))
 
 print(all_beacons)
