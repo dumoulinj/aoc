@@ -1,13 +1,9 @@
 from aocd.models import Puzzle
 from aocd import lines
-from collections import defaultdict, Counter
-from copy import copy, deepcopy
-import itertools
-import sys
+from collections import defaultdict
+from copy import deepcopy
 import math
 import attr
-# a: 
-# b: 
 
 puzzle = Puzzle(year=2021, day=19)
 
@@ -61,6 +57,7 @@ class Scanner(object):
     ref_beacons:list = attr.ib(init=False, factory=list)
     distances:defaultdict = attr.ib(init=False, default=attr.Factory(lambda: defaultdict(list)))
     position:Position = attr.ib(init=False)
+    ref_position:Position = attr.ib(init=False)
     orientation:Orientation = attr.ib(init=False)
     parent = attr.ib(init=False, factory=bool)
 
@@ -80,8 +77,6 @@ class Scanner(object):
                 d = get_distance(b1, b2)
                 self.distances[d].append((b1, b2))
 
-with open('ex19.txt') as infile:
-   lines = infile.readlines()
 
 def get_distance(b1, b2):
     return int(math.sqrt((b2.x - b1.x)**2 + (b2.y - b1.y)**2 + (b2.z - b1.z)**2))
@@ -204,6 +199,13 @@ def get_transformations(a, b):
 
     return transformations
 
+def get_manhattan_distance(a, b):
+    return abs(a.x - b.x) + abs(a.y - b.y) + abs(a.z - b.z)
+
+
+# with open('ex19.txt') as infile:
+#    lines = infile.readlines()
+
 scanners = list()
 scanner_id = 0
 scanner = None
@@ -215,6 +217,7 @@ for l in lines:
         if scanner_id == 0:
             scanner.orientation = Orientation(1, 1, 1, 0)
             scanner.position = Position(0, 0, 0)
+            scanner.ref_position = Position(0, 0, 0)
             scanner.parent = None
     elif l == "" or l == " ":
         scanners.append(scanner)
@@ -249,7 +252,6 @@ while len(unref_scanners) > 0:
                 break
             
             s1 = sref
-            # print(s1._id, s2._id)
 
             ed = get_equal_distances(s1, s2)
 
@@ -275,23 +277,20 @@ while len(unref_scanners) > 0:
                     # print("Count ", count)
 
                     if count >= 12:
-                        print("Found ", s2._id, s1._id, t)
+                        # print("Found ", s2._id, s1._id, t)
                         found_ref = True
 
                         s2.position = t.pos
+                        s2.ref_position = deepcopy(t.pos)
                         s2.orientation = t.o
                         s2.parent = s1
+
                         parent = s2.parent
-
                         s2.ref_beacons = [apply_transformation(p, Transformation(s2.position, s2.orientation)) for p in s2.ref_beacons]
-                        if parent is not None:
-                            s2.position = apply_transformation(s2.position, Transformation(parent.position, parent.orientation))
+                        while parent is not None:
+                            s2.ref_position = apply_transformation(s2.ref_position, Transformation(parent.position, parent.orientation))
                             s2.ref_beacons = [apply_transformation(p, Transformation(parent.position, parent.orientation)) for p in s2.ref_beacons]
-
-                        # while parent is not None:
-                        #     s2.position = apply_transformation(s2.position, Transformation(parent.position, parent.orientation))
-                        #     s2.ref_beacons = [apply_transformation(p, Transformation(parent.position, parent.orientation)) for p in s2.ref_beacons]
-                        #     parent = parent.parent
+                            parent = parent.parent
 
                         new_ref_scanners.append(s2)
                         break
@@ -299,28 +298,28 @@ while len(unref_scanners) > 0:
         if not found_ref:
             new_unref_scanners.append(s2)
                     
-    # unref_scanners = deepcopy(new_unref_scanners)
-    # ref_scanners = deepcopy(new_ref_scanners)
     unref_scanners = new_unref_scanners
     ref_scanners = new_ref_scanners
 
-
-        
 all_beacons = set()
 for s in scanners:
-    print(s._id, s.position, s.orientation, s.parent._id if s.parent is not None else None)
-    # if s._id != 1:
-    #     continue
+    # print(s._id, s.position, s.orientation, s.parent._id if s.parent is not None else None)
 
-    #s.beacons = [apply_transformation(p, Transformation(s.position, s.orientation)) for p in s.beacons]
     for b in s.ref_beacons:
         all_beacons.add((b.x, b.y, b.z))
 
-print(all_beacons)
+# print(all_beacons)
 
 res = len(all_beacons)
 print("part a: {}".format(res))
-#puzzle.answer_a = res
+puzzle.answer_a = res
 
+max_d = 0
+for i, s1 in enumerate(scanners[:-1]):
+    for j, s2 in enumerate(scanners[i+1:]):
+        d = get_manhattan_distance(s1.ref_position, s2.ref_position)
+        max_d = max(d, max_d)
+
+res = max_d
 print("part b: {}".format(res))
-#puzzle.answer_b = res
+puzzle.answer_b = res
