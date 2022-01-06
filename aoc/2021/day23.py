@@ -1,125 +1,275 @@
-from aocd.models import Puzzle
-from aocd import lines
-from collections import defaultdict, Counter
+# from aocd.models import Puzzle
 from copy import copy, deepcopy
-import itertools
-import sys
-import math
-from enum import Enum
 
-import attr
-# a:
-# b:
+# puzzle = Puzzle(year=2021, day=23)
 
-puzzle = Puzzle(year=2021, day=23)
+hotel = dict()
 
-# with open('ex23.txt') as infile:
-#    lines = infile.readlines()
+for c in range(11):
+    hotel[(0, c)] = "."
 
+ROOMS_SIZE = 4
 
-class CellType(Enum):
-    HALL = 1
-    RA = 2
-    RB = 3
-    RC = 4
-    RD = 5
-
-
-@attr.s
-class Cell(object):
-    cell_type = attr.ib()
-    occupied = attr.ib(init=True, default=False)
-    left = attr.ib(init=False, default=None)
-    right = attr.ib(init=False, default=None)
-    up = attr.ib(init=False, default=None)
-    down = attr.ib(init=False, default=None)
-
-class AmphipodType(Enum):
-    A = 1
-    B = 2
-    C = 3
-    D = 4
-
-@attr.s
-class Amphipod(object):
-    amphipod_type = attr.ib()
-    cell = attr.ib()
-    found_place = attr.ib(init=True, default=False)
-
-@attr.s
-class Hotel(object):
-    amphipods = attr.ib()
-
-    def init(self):
-        ra1 = Cell(CellType.RA, occupied=True)
-        ra2 = Cell(CellType.RA, occupied=True)
-        ra1.down = ra2
-        ra2.up = ra1
-
-        rb1 = Cell(CellType.RB, occupied=True)
-        rb2 = Cell(CellType.RB, occupied=True)
-        rb1.down = rb2
-        rb2.up = rb1
-
-        rc1 = Cell(CellType.RC, occupied=True)
-        rc2 = Cell(CellType.RC, occupied=True)
-        rc1.down = rc2
-        rc2.up = rc1
-
-        rd1 = Cell(CellType.RD, occupied=True)
-        rd2 = Cell(CellType.RD, occupied=True)
-        rd1.down = rd2
-        rd2.up = rd1
-
-        hallway = list()
-        for _ in range(11):
-            c = Cell(CellType.HALL)
-            hallway.append(c)
-        
-        for i in range(11):
-            if i > 0:
-                hallway[i].left = hallway[i-1]
-            if i < 10:
-                hallway[i].right = hallway[i+1]
-        
-        hallway[2].down = ra1
-        ra1.up = hallway[2]
-
-        hallway[4].down = rb1
-        rb1.up = hallway[4]
-
-        hallway[6].down = rc1
-        rc1.up = hallway[6]
-
-        hallway[8].down = rd1
-        rd1.up = hallway[8]
-
-        self.amphipods = [
-            Amphipod(AmphipodType.A, ra1),
-            Amphipod(AmphipodType.A, ra2, True),
-            Amphipod(AmphipodType.B, rb1),
-            Amphipod(AmphipodType.B, rb2),
-            Amphipod(AmphipodType.C, rc1),
-            Amphipod(AmphipodType.C, rc2, True),
-            Amphipod(AmphipodType.D, rd1),
-            Amphipod(AmphipodType.D, rd2)
-        ]
-
-
-
-ENERGY = {
-    AmphipodType.A: 1,
-    AmphipodType.B: 10,
-    AmphipodType.C: 100,
-    AmphipodType.D: 1000
+room_col = {
+    "A": 2,
+    "B": 4,
+    "C": 6,
+    "D": 8
 }
 
-hotel = Hotel()
-hotel.init()
+# # RA
+# hotel[(1, room_col["A"])] = "B"
+# hotel[(2, room_col["A"])] = "A"
 
-res = 0
-print("part a: {}".format(res))
-#puzzle.answer_a = res 
+# # RB
+# hotel[(1, room_col["B"])] = "C"
+# hotel[(2, room_col["B"])] = "D"
 
-print("part b: {}".format(res))
-#puzzle.answer_b = res 
+# # RC
+# hotel[(1, room_col["C"])] = "B"
+# hotel[(2, room_col["C"])] = "C"
+
+# # RD
+# hotel[(1, room_col["D"])] = "D"
+# hotel[(2, room_col["D"])] = "A"
+
+# # RA
+# hotel[(1, room_col["A"])] = "B"
+# hotel[(2, room_col["A"])] = "D"
+# hotel[(3, room_col["A"])] = "D"
+# hotel[(4, room_col["A"])] = "A"
+
+# # RB
+# hotel[(1, room_col["B"])] = "C"
+# hotel[(2, room_col["B"])] = "C"
+# hotel[(3, room_col["B"])] = "B"
+# hotel[(4, room_col["B"])] = "D"
+
+# # RC
+# hotel[(1, room_col["C"])] = "B"
+# hotel[(2, room_col["C"])] = "B"
+# hotel[(3, room_col["C"])] = "A"
+# hotel[(4, room_col["C"])] = "C"
+
+# # RD
+# hotel[(1, room_col["D"])] = "D"
+# hotel[(2, room_col["D"])] = "A"
+# hotel[(3, room_col["D"])] = "C"
+# hotel[(4, room_col["D"])] = "A"
+
+# RA
+hotel[(1, room_col["A"])] = "A"
+hotel[(2, room_col["A"])] = "D"
+hotel[(3, room_col["A"])] = "D"
+hotel[(4, room_col["A"])] = "C"
+
+# RB
+hotel[(1, room_col["B"])] = "D"
+hotel[(2, room_col["B"])] = "C"
+hotel[(3, room_col["B"])] = "B"
+hotel[(4, room_col["B"])] = "D"
+
+# RC
+hotel[(1, room_col["C"])] = "A"
+hotel[(2, room_col["C"])] = "B"
+hotel[(3, room_col["C"])] = "A"
+hotel[(4, room_col["C"])] = "B"
+
+# RD
+hotel[(1, room_col["D"])] = "C"
+hotel[(2, room_col["D"])] = "A"
+hotel[(3, room_col["D"])] = "C"
+hotel[(4, room_col["D"])] = "B"
+
+def get_room_ticket(hotel, a):
+    C = room_col[a]
+
+    for r in range(ROOMS_SIZE, 0, -1):
+        if hotel[(r, C)] == ".":
+            return (r, C)
+        elif hotel[(r, C)] != a:
+            return None 
+    
+    return None
+    
+def get_path(hotel, source, dest):
+    nb_steps = 0
+    
+    crt = source
+
+    while True:
+        if crt == dest:
+            return nb_steps
+        
+        if source[0] > 0 and crt[0] > 0 and crt[1] == source[1]:
+            crt = (crt[0] - 1, crt[1])
+        else:
+            if crt[1] < dest[1]:
+                crt = (crt[0], crt[1] + 1)
+            elif crt[1] > dest[1]:
+                crt = (crt[0], crt[1] - 1)
+            else:
+                crt = (crt[0] + 1, crt[1])
+
+        if hotel[crt] != ".":
+            return None
+        
+        nb_steps += 1
+
+def is_in_place(hotel, cell):
+    a = hotel[cell]
+    C = room_col[a]
+
+    if cell[0] == 0:
+        return False
+    
+    if cell[1] != C:
+        return False
+
+    for r in range(ROOMS_SIZE, cell[0], -1):
+        if hotel[(r, C)] != a:
+            return False
+    
+    return True
+
+def is_solved(hotel):
+    for a, c in room_col.items():
+        for r in range(1, ROOMS_SIZE + 1):
+            if hotel[(r, c)] != a:
+                return False
+    return True
+
+def print_hotel(hotel):
+    for r in range(2 + ROOMS_SIZE):
+        for c in range(-1, 12):
+            if (r, c) in hotel:
+                print(hotel[(r, c)], end="")
+            else:
+                print(" ", end="")
+        print()
+
+def get_minimum_cost(hotel):
+    cost = 0
+    cells = [c for c in hotel if hotel[c] != '.' and not is_in_place(hotel, c)]
+
+    in_place = dict()
+
+    for a in room_col.keys():
+        in_place[a] = ROOMS_SIZE
+
+    for cell in cells:
+        in_place[hotel[cell]] -= 1
+    
+    for cell in cells:
+        a = hotel[cell]
+        steps = abs(room_col[a] - cell[1]) + ROOMS_SIZE - in_place[a]
+        cost += steps * ENERGY[a]
+        in_place[a] += 1
+    
+    return cost
+
+ENERGY = {
+    "A": 1,
+    "B": 10,
+    "C": 100,
+    "D": 1000
+}
+
+best_score = 1e10
+
+print_hotel(hotel)
+
+optimize = True 
+
+def solve(hotel, score):
+    global best_score 
+    global optimize
+
+    # print_hotel(hotel)
+    # input("Press Enter to continue...")
+
+    # all candidates
+    candidates = list()
+    for cell, a in hotel.items():
+        if a != ".":
+            if not is_in_place(hotel, cell):
+                if cell[0] > 0:
+                    if hotel[(cell[0]-1, cell[1])] == '.':
+                        candidates.append(cell)
+                else:
+                    candidates.append(cell)
+
+    if optimize:
+        candidates.sort(key=lambda x:ENERGY[hotel[x]], reverse=True)
+
+    for cell in candidates:
+        a = hotel[cell]
+        room = get_room_ticket(hotel, a)
+
+        if room:
+            steps = get_path(hotel, cell, room)
+
+            if steps:
+                new_score = score + steps * ENERGY[a]
+
+                if new_score > best_score:
+                    continue
+
+                new_hotel = deepcopy(hotel)
+                new_hotel[cell] = "."
+                new_hotel[room] = a
+
+                if is_solved(new_hotel):
+                    if new_score != best_score:
+                        best_score = min(best_score, new_score)
+                        if best_score == new_score:
+                            print(best_score)
+                    return
+                
+                if optimize:
+                    if new_score + get_minimum_cost(new_hotel) > best_score:
+                        continue
+
+                solve(new_hotel, new_score)
+    
+
+    # candidates not in hallway
+    candidates = list()
+    for cell, a in hotel.items():
+        if a != ".":
+            if not is_in_place(hotel, cell) and cell[0] > 0 and hotel[(cell[0]-1, cell[1])] == '.':
+                candidates.append(cell)
+    
+    #candidates.sort(key=lambda x:x[1], reverse=False)
+    
+    for cell in candidates:
+        hcs = list(range(11))
+        if optimize:
+            hcs.sort(key=lambda x:abs(cell[1]-x))
+        for c in hcs:
+            if c not in [2, 4, 6, 8] and hotel[(0, c)] == '.':
+                hc = (0, c)
+                a = hotel[cell]
+                steps = get_path(hotel, cell, hc)
+
+                if steps:
+                    new_score = score + steps * ENERGY[a]
+
+                    if new_score > best_score:
+                        continue
+
+                    new_hotel = deepcopy(hotel)
+                    new_hotel[cell] = "."
+                    new_hotel[hc] = a
+
+                    if optimize:
+                        if new_score + get_minimum_cost(new_hotel) > best_score:
+                            continue
+
+                    solve(new_hotel, new_score)
+
+    return
+
+solve(hotel, 0)
+
+print(best_score)
