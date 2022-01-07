@@ -168,6 +168,20 @@ def get_minimum_cost(hotel):
     
     return cost
 
+
+def get_hotel_hash(hotel):
+    _hash = ""
+
+    for c in range(11):
+        _hash += hotel[(0, c)]
+    
+    for c in [2, 4, 6, 8]:
+        for r in range(1, ROOMS_SIZE+1):
+            _hash += hotel[(r, c)]
+    
+    return _hash
+
+
 ENERGY = {
     "A": 1,
     "B": 10,
@@ -181,9 +195,22 @@ print_hotel(hotel)
 
 optimize = True 
 
-def solve(hotel, score):
+DP = dict()
+
+def solve(hotel):
     global best_score 
     global optimize
+    global DP
+
+    if is_solved(hotel):
+        return 0
+
+    hotel_hash = get_hotel_hash(hotel)
+
+    if hotel_hash in DP:
+        return DP[hotel_hash]
+
+
 
     # print_hotel(hotel)
     # input("Press Enter to continue...")
@@ -202,6 +229,7 @@ def solve(hotel, score):
     if optimize:
         candidates.sort(key=lambda x:ENERGY[hotel[x]], reverse=True)
 
+
     for cell in candidates:
         a = hotel[cell]
         room = get_room_ticket(hotel, a)
@@ -210,27 +238,21 @@ def solve(hotel, score):
             steps = get_path(hotel, cell, room)
 
             if steps:
-                new_score = score + steps * ENERGY[a]
+                cost = steps * ENERGY[a]
 
-                if new_score > best_score:
-                    continue
+                # if new_score > best_score:
+                #     continue
 
                 new_hotel = deepcopy(hotel)
                 new_hotel[cell] = "."
                 new_hotel[room] = a
 
-                if is_solved(new_hotel):
-                    if new_score != best_score:
-                        best_score = min(best_score, new_score)
-                        if best_score == new_score:
-                            print(best_score)
-                    return
                 
-                if optimize:
-                    if new_score + get_minimum_cost(new_hotel) > best_score:
-                        continue
+                # if optimize:
+                #     if new_score + get_minimum_cost(new_hotel) > best_score:
+                #         continue
 
-                solve(new_hotel, new_score)
+                return cost + solve(new_hotel)
     
 
     # candidates not in hallway
@@ -242,6 +264,7 @@ def solve(hotel, score):
     
     #candidates.sort(key=lambda x:x[1], reverse=False)
     
+    ans = 1e10
     for cell in candidates:
         hcs = list(range(11))
         if optimize:
@@ -253,23 +276,24 @@ def solve(hotel, score):
                 steps = get_path(hotel, cell, hc)
 
                 if steps:
-                    new_score = score + steps * ENERGY[a]
+                    cost = steps * ENERGY[a]
 
-                    if new_score > best_score:
-                        continue
+                    # if new_score > best_score:
+                    #     continue
 
                     new_hotel = deepcopy(hotel)
                     new_hotel[cell] = "."
                     new_hotel[hc] = a
 
-                    if optimize:
-                        if new_score + get_minimum_cost(new_hotel) > best_score:
-                            continue
+                    # if optimize:
+                    #     if new_score + get_minimum_cost(new_hotel) > best_score:
+                    #         continue
 
-                    solve(new_hotel, new_score)
+                    ans = min(ans, cost + solve(new_hotel))
+    
 
-    return
+        DP[hotel_hash] = ans
+    
+    return ans
 
-solve(hotel, 0)
-
-print(best_score)
+print(solve(hotel))
