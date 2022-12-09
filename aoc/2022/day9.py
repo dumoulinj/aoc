@@ -48,7 +48,11 @@ def do_move(H, T):
     else:
         return False 
 
+<<<<<<< HEAD
 def viz():
+=======
+def viz(snake):
+>>>>>>> 64d4b1d (Add 2022 day9)
     min_r = min(-5, min([x[0] for x in snake]))
     max_r = max(5, max([x[0] for x in snake]))
     min_c = min(-5, min([x[1] for x in snake]))
@@ -86,7 +90,7 @@ def run(size, do_viz):
     m[(0, 0)] = 1
 
     if do_viz:
-        viz()
+        viz(snake)
 
 
     for l in lines:
@@ -100,7 +104,7 @@ def run(size, do_viz):
                 do_move(snake[j], snake[j+1])
             m[(snake[-1][0], snake[-1][1])] += 1
             if do_viz:
-                viz()
+                viz(snake)
 
     return len(m) 
 
