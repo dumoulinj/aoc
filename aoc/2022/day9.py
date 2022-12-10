@@ -2,6 +2,8 @@ from aocd.models import Puzzle
 # from aocd import numbers
 from aocd import lines
 from collections import defaultdict
+import os
+
 
 # a: 
 # b:  
@@ -10,7 +12,9 @@ day = 9
 
 puzzle = Puzzle(year=2022, day=day)
 
-# with open('day9.ex') as infile:
+
+exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'day{}.ex'.format(day))
+# with open(exfile) as infile:
 #     lines = infile.readlines()
 
 
@@ -48,11 +52,7 @@ def do_move(H, T):
     else:
         return False 
 
-<<<<<<< HEAD
-def viz():
-=======
 def viz(snake):
->>>>>>> 64d4b1d (Add 2022 day9)
     min_r = min(-5, min([x[0] for x in snake]))
     max_r = max(5, max([x[0] for x in snake]))
     min_c = min(-5, min([x[1] for x in snake]))
