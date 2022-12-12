@@ -1,4 +1,5 @@
 
+import math
 from aocd.models import Puzzle 
 # from aocd import numbers
 from aocd import lines
@@ -32,7 +33,7 @@ class Monkey:
 mi = 0
 monkeys = []
 monkey = None
-pgdc = 1
+dividers = []
 for l in lines:
     l = l.lstrip().strip()
     if l.startswith('Monkey'):
@@ -56,11 +57,13 @@ for l in lines:
         monkey.op_val = op_val
     elif l.startswith('Test'):
         monkey.test = int(l.split()[-1])
-        pgdc *= monkey.test
+        dividers.append(monkey.test)
     elif l.startswith('If true'):
         monkey.true = int(l.split()[-1])
     elif l.startswith('If false'):
         monkey.false = int(l.split()[-1])
+
+lcm = math.lcm(*dividers)
 
 monkeys.append(monkey)
 
@@ -94,7 +97,7 @@ def run(part, monkeys):
                 else:
                     idx = m.false
 
-                si = si % pgdc
+                si = si % lcm
                 monkeys[idx].items.append(si)
                 # print('Append {} to monkey {}'.format(si, idx))
         
