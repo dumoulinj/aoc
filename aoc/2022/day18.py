@@ -13,9 +13,9 @@ day = 18
 
 puzzle = Puzzle(year=2022, day=day)
 
-exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'day{}.ex'.format(day))
-with open(exfile) as infile:
-    lines = infile.readlines()
+# exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'day{}.ex'.format(day))
+# with open(exfile) as infile:
+#     lines = infile.readlines()
 
 
 dirs = [(-1, 0, 0), (1, 0, 0), (0, -1, 0), (0, 1, 0), (0, 0, 1), (0, 0, -1)]
@@ -62,38 +62,25 @@ print(maxx, maxy, maxz)
 res_b = 0
 visited = set()
 
-# def dfs(c):
-#     if c in cubes:
-#         return 1
-
-#     visited.add(c)
-
-#     ans = 0
-#     for d in dirs:
-#         xx = c[0] + d[0]
-#         yy = c[1] + d[1]
-#         zz = c[2] + d[2]
-
-#         cc = (xx, yy, zz)
-
-#         if cc not in visited and minx-1 <= xx <= maxx+1 and miny-1 <= yy <= maxy+1 and minz-1 <= zz <= maxz+1:
-#             ans += dfs(cc)
-
-#     return ans
-
-# res_b = dfs((minx-1, miny-1, minz-1))
-
 Q = deque()
 Q.append((minx-1, miny-1, minz-1))
+Q.append((maxx+1, maxy+1, maxz+1))
 
 ans = 0
 while Q:
-    c = Q.pop()
-    visited.add(c)
+    c = Q.popleft()
+    
+    if not(minx-1 <= c[0] <= maxx+1 and miny-1 <= c[1] <= maxy+1 and minz-1 <= c[2] <= maxz+1):
+        continue
+
+    if c in visited:
+        continue
 
     if c in cubes:
         ans += 1
         continue
+
+    visited.add(c)
 
     for d in dirs:
         xx = c[0] + d[0]
@@ -102,29 +89,9 @@ while Q:
 
         cc = (xx, yy, zz)
 
-        if cc not in visited and minx-1 <= xx <= maxx+1 and miny-1 <= yy <= maxy+1 and minz-1 <= zz <= maxz+1:
-            Q.append(cc)
+        Q.append(cc)
 
 res_b = ans
-
-# for c in cubes:
-#     for d in dirs:
-#         i = 1
-#         while True:
-#             xx = c[0] + i * d[0]
-#             yy = c[1] + i * d[1]
-#             zz = c[2] + i * d[2]
-
-#             if minx <= xx <= maxx and miny <= yy <= maxy and minz <= zz <= maxz:
-#                 if (xx, yy, zz) in cubes:
-#                     break
-#             else:
-#                 res_b += 1
-#                 break
-
-#             i += 1
-
-
 
 print("part b: {}".format(res_b))
 
