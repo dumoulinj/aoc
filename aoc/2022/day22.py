@@ -13,9 +13,9 @@ day = 22
 
 puzzle = Puzzle(year=2022, day=day)
 
-exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'day{}.ex'.format(day))
-with open(exfile) as infile:
-    lines = infile.readlines()
+# exfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'day{}.ex'.format(day))
+# with open(exfile) as infile:
+#     lines = infile.readlines()
 
 def draw(pos):
     global maxx, maxy, pixels, m
@@ -30,7 +30,7 @@ def draw(pos):
         print()
 
 
-pixels = ['|', '.', '#']
+pixels = [' ', '.', '#']
 
 m = defaultdict(int)
 
@@ -65,15 +65,52 @@ if v != '':
 # print(steps)
 
 dirs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-facing = 0
 
+def run(pos, facing):
+    global steps, m, dirs, pixels
+
+    for step in steps:
+        if step == 'L':
+            facing -= 1
+            if facing == -1:
+                facing = 3
+        elif step == 'R':
+            facing = (facing + 1) % 4
+        else:
+            for i in range(step):
+                new_pos = (pos[0] + dirs[facing][0], pos[1] + dirs[facing][1])
+                if new_pos not in m:
+                    if facing == 0:
+                        # Right
+                        new_pos = (new_pos[0], min([k[1] for k in m.keys() if k[0] == new_pos[0]]))
+                    elif facing == 1:
+                        # Down 
+                        new_pos = (min([k[0] for k in m.keys() if k[1] == new_pos[1]]), new_pos[1])
+                    elif facing == 2:
+                        # Left 
+                        new_pos = (new_pos[0], max([k[1] for k in m.keys() if k[0] == new_pos[0]]))
+                    elif facing == 3:
+                        # Up 
+                        new_pos = (max([k[0] for k in m.keys() if k[1] == new_pos[1]]), new_pos[1])
+                    
+                if m[new_pos] == pixels.index('#'):
+                    break
+                else:
+                    pos = new_pos
+                
+                # draw(pos)
+                # input()
+    
+    return 1000 * pos[0] + 4 * pos[1] + facing
+
+facing = 0
 pos = (1, min([k[1] for k in m if k[0] == 1]))
-draw(pos)
-res_a = 0
+
+res_a = run(pos, facing)
 print("part a: {}".format(res_a))
 
 res_b = 0
 print("part a: {}".format(res_b))
 
-# puzzle.answer_a = res_a
+puzzle.answer_a = res_a
 # puzzle.answer_b = res_b
